@@ -1,0 +1,29 @@
+# Ignore Xcode specific files
+build/
+DerivedData/
+*.xcuserdatad
+*.xcuserdata
+
+# Ignore Swift Package Manager files
+/.build/
+/Packages/
+/Package.resolved
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore temporary files created by Xcode
+*.moved-aside
+*.swp
+*.xcuserstate
+
+# Ignore Xcode project workspace and schemes files
+xcuserdata/
+*.xcworkspace
+xcshareddata/
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore custom specific files or specific /SPM/ frameworks in future
