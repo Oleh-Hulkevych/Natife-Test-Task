@@ -6,6 +6,5 @@
 //
 
 protocol DependencyContainerProtocol {
-    var coreDataManager: CoreDataManagerProtocol { get }
     var networkService: NetworkServiceProtocol { get }
 }

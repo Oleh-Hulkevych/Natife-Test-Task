@@ -44,4 +44,57 @@ final class MoviesCoordinator: MoviesCoordinatorProtocol {
         viewController.modalPresentationStyle = .fullScreen
         navigationController.present(viewController, animated: true)
     }
+    
+    func showSortActionSheet(
+        from viewController: UIViewController,
+        currentOption: SortOption,
+        sourceButton: UIBarButtonItem,
+        onSelect: @escaping (SortOption) -> Void
+    ) {
+        let alert = UIAlertController(
+            title: LocalizedKey.sortOptionsTitle.localizedString,
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        SortOption.allCases.forEach { option in
+            let action = UIAlertAction(
+                title: option.title,
+                style: .default
+            ) { _ in
+                onSelect(option)
+            }
+            if option == currentOption {
+                action.setValue(true, forKey: "checked")
+            }
+            
+            alert.addAction(action)
+        }
+        
+        alert.addAction(UIAlertAction(
+            title: LocalizedKey.sortOptionsCancelButton.localizedString,
+            style: .cancel
+        ))
+        
+        if let popoverController = alert.popoverPresentationController {
+            popoverController.barButtonItem = sourceButton
+        }
+        
+        viewController.present(alert, animated: true)
+    }
+    
+    func showAlert(
+        from viewController: UIViewController,
+        title: String,
+        message: String?,
+        buttonTitle: String
+    ) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: buttonTitle, style: .default))
+        viewController.present(alert, animated: true)
+    }
 }

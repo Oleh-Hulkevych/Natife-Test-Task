@@ -6,156 +6,156 @@
 //
 
 import Foundation
+import Combine
 
-protocol MoviesFeedViewModelProtocol: ObservableObject {
-    
-    // State Publishers
-    var moviesPublisher: Published<[Movie]>.Publisher { get }
-    var errorPublisher: Published<NetworkError?>.Publisher { get }
-    var isLoadingPublisher: Published<Bool>.Publisher { get }
-    
-    // Current State
-    var currentMovies: [Movie] { get }
-    
-    // User Actions
-    func fetchMovies() async
-    func searchMovies(query: String) async
-    func loadMoreIfNeeded(currentItem: Movie)
+protocol MoviesFeedViewModelProtocol: AnyObject {
+    var state: MoviesFeedState { get }
+    var statePublisher: Published<MoviesFeedState>.Publisher { get }
+    func loadMorePopularMovies()
     func applySorting(_ option: SortOption)
-    func refreshData() async
+    func refreshMovies()
+    func searchMovies(query: String)
+    func switchUserFlow(to flow: MoviesFeedUserFlow)
 }
 
 final class MoviesFeedViewModel: MoviesFeedViewModelProtocol {
-    
-    // MARK: Published Properties
-    @Published private var movies: [Movie] = []
-    @Published private var error: NetworkError?
-    @Published private var isLoading = false
-    @Published private var sortOption: SortOption = .defaultOption
-    
-    // MARK: Published Publishers (Protocol Conformance)
-    var moviesPublisher: Published<[Movie]>.Publisher { $movies }
-    var errorPublisher: Published<NetworkError?>.Publisher { $error }
-    var isLoadingPublisher: Published<Bool>.Publisher { $isLoading }
-    
-    var currentMovies: [Movie] {
-            movies
-        }
-    
-    // MARK: Private Properties
-    private var currentPage = 1
-    private var hasReachedEnd = false
-    private var searchQuery: String?
-    
-    // MARK: Dependencies & initialization
+
+    @Published private(set) var state = MoviesFeedState()
+    var statePublisher: Published<MoviesFeedState>.Publisher { $state }
+    private var cancellables: Set<AnyCancellable> = []
+
     private let useCase: MoviesUseCaseProtocol
 
     init(useCase: MoviesUseCaseProtocol) {
         self.useCase = useCase
-    }
-
-    // MARK: Protocol Methods
-    func fetchMovies() async {
-        guard !isLoading else { return }
-        isLoading = true
-        error = nil
-
-        do {
-            let newMovies = try await useCase.fetchPopularMovies(page: currentPage)
-            if !newMovies.isEmpty {
-                movies.append(contentsOf: sortOption == .defaultOption ? newMovies : sortMovies(newMovies))
-            }
-            hasReachedEnd = newMovies.isEmpty
-        } catch let networkError as NetworkError {
-            self.error = networkError
-        } catch {
-            self.error = .requestFailed(underlyingError: error)
-        }
-
-        isLoading = false
+        setupNetworkConnectionObserver()
+        loadPopularMovies()
     }
     
-    func searchMovies(query: String) async {
-        guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
-            searchQuery = nil
-            currentPage = 1
-            await fetchMovies()
-            return
-        }
-        
-        guard !isLoading else { return }
-        isLoading = true
-        error = nil
-        searchQuery = query
-        currentPage = 1
-        
-        do {
-            let searchResults = try await useCase.searchMovies(query: query, page: currentPage)
-            movies = sortOption == .defaultOption ? searchResults : sortMovies(searchResults)
-            hasReachedEnd = searchResults.isEmpty
-        } catch let networkError as NetworkError {
-            self.error = networkError
-        } catch {
-            self.error = .requestFailed(underlyingError: error)
-        }
-        
-        isLoading = false
+    // MARK: Observers
+    
+    private func setupNetworkConnectionObserver() {
+        useCase.isConnectedPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isConnected in
+                guard let self else { return }
+                self.updateState { $0.isNetworkConnected = isConnected }
+            }
+            .store(in: &cancellables)
     }
     
-    func loadMoreIfNeeded(currentItem: Movie) {
-        guard let lastMovie = movies.last,
-              lastMovie.id == currentItem.id,
-              !isLoading,
-              !hasReachedEnd else {
-            return
-        }
-        
-        currentPage += 1
-        Task {
-            if let query = searchQuery {
-                await searchMovies(query: query)
-            } else {
-                await fetchMovies()
-            }
+    // MARK: Data methods
+    
+    private func loadPopularMovies() {
+        guard case .none = state.loading else { return }
+        updateState { $0.loading = .initial }
+        performMoviesOperation(with: .browsing) { [weak self] in
+            guard let self else { return [] }
+            let pageNumber = self.state.currentPage
+            return try await self.useCase.loadPopularMovies(
+                page: pageNumber
+            )
         }
     }
+    
+    func loadMorePopularMovies() {
+        guard case .none = state.loading else { return }
+        updateState {
+            $0.loading = .pagination
+            $0.currentPage += 1
+        }
+        performMoviesOperation(with: .browsing) { [weak self] in
+            guard let self else { return [] }
+            let pageNumber = self.state.currentPage
+            let newMovies = try await self.useCase.loadPopularMovies(page: pageNumber)
+            self.updateState { state in
+                state.currentPage = newMovies.isEmpty ? 1 : pageNumber
+            }
+            return newMovies
+        }
+    }
+    
+    func searchMovies(query: String) {
+        guard case .none = state.loading else { return }
+        updateState { $0.loading = .searching }
+        performMoviesOperation(with: .searching) { [weak self] in
+            guard let self else { return [] }
+            return try await self.useCase.searchMovies(query: query)
+        }
+    }
+    
+    // MARK: Sorting methods
     
     func applySorting(_ option: SortOption) {
-        sortOption = option
-        movies = sortMovies(movies)
-    }
-    
-    func refreshData() async {
-        currentPage = 1
-        hasReachedEnd = false
-        if let query = searchQuery {
-            await searchMovies(query: query)
-        } else {
-            await fetchMovies()
+        Task {
+            let movies = await sortMovies(by: option)
+            updateState {
+                $0.sortOption = option
+                $0.movies = movies
+            }
         }
     }
-    
-    // MARK: - Private Methods
-    private func sortMovies(_ movies: [Movie]) -> [Movie] {
-        switch sortOption {
-        case .nameAscending:
-            return movies.sorted { $0.title < $1.title }
-        case .nameDescending:
-            return movies.sorted { $0.title > $1.title }
-        case .yearAscending:
-            return movies.sorted { $0.year < $1.year }
-        case .yearDescending:
-            return movies.sorted { $0.year > $1.year }
-        case .ratingAscending:
-            return movies.sorted { $0.rating < $1.rating }
-        case .ratingDescending:
-            return movies.sorted { $0.rating > $1.rating }
-        case .votesAscending:
-            return movies.sorted { $0.votes < $1.votes }
-        case .votesDescending:
-            return movies.sorted { $0.votes > $1.votes }
+
+    private func sortMovies(by option: SortOption) async -> [Movie] {
+        switch option {
         case .defaultOption:
-            return movies
+            return await useCase.loadCachedPopularMovies()
+        case let sortOption:
+            return state.movies.sorted(by: sortOption)
         }
+    }
+    
+    func switchUserFlow(to flow: MoviesFeedUserFlow) {
+        updateState { $0.userFlow = flow }
+    }
+
+    func refreshMovies() {
+        updateState {
+            $0.sortOption = .defaultOption
+            $0.currentPage = 1
+            $0.searchText = nil
+            $0.error = nil
+        }
+        loadPopularMovies()
+    }
+    
+    // MARK: Private Methods
+    
+    private func performMoviesOperation(with flow: MoviesFeedUserFlow, _ operation: @escaping () async throws -> [Movie]) {
+        Task {
+            do {
+                let movies = try await operation()
+                handleSuccess(movies, userFlow: flow)
+                updateState { $0.loading = .none }
+            } catch let error as NetworkError {
+                updateState {
+                    $0.error = error
+                    $0.loading = .none
+                }
+            }
+        }
+    }
+
+    private func handleSuccess(_ movies: [Movie], userFlow: MoviesFeedUserFlow) {
+       updateState {
+           switch userFlow {
+           case .browsing:
+               let sortedMovies = movies.sorted(by: $0.sortOption)
+               if $0.currentPage == 1 {
+                   $0.movies = sortedMovies
+               } else {
+                   $0.movies.append(contentsOf: sortedMovies)
+               }
+               
+           case .searching:
+               $0.movies = movies
+           }
+       }
+    }
+    
+    private func updateState(_ update: (inout MoviesFeedState) -> Void) {
+        var newState = state
+        update(&newState)
+        state = newState
     }
 }

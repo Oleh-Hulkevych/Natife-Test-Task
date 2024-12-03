@@ -13,4 +13,16 @@ protocol MoviesCoordinatorProtocol: AnyObject {
     func showMovieDetails(with id: Int)
     func showPosterImage(_ imageURL: String)
     func showTrailerVideo(_ videoURL: String)
+    func showSortActionSheet(
+        from viewController: UIViewController,
+        currentOption: SortOption,
+        sourceButton: UIBarButtonItem,
+        onSelect: @escaping (SortOption) -> Void
+    )
+    func showAlert(
+        from viewController: UIViewController,
+        title: String,
+        message: String?,
+        buttonTitle: String
+    )
 }

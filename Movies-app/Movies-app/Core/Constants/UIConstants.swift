@@ -12,4 +12,6 @@ enum UIConstants {
     static let cornerRadius: CGFloat = 16
     static let mediumPadding: CGFloat = 16
     static let smallPadding: CGFloat = 8
+    static let pointSeparator: String = " • "
+    static let bigItemSideSize: CGFloat = 56
 }

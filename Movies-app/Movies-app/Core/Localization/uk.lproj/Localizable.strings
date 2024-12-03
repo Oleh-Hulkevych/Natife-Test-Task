@@ -7,7 +7,7 @@
 */
 
 // MARK: Movies feed scene
-"moviesSceneTitle" = "Фільми";
+"moviesSceneTitle" = "Відомі фільми";
 "searchPlaceholder" = "Пошук";
 "noResultsLabel" = "Фільмів не знайдено";
 "noPosterLabel" = "Немає постера";
@@ -16,21 +16,17 @@
 
 // MARK: Sort options
 "sortOptionsTitle" = "Сортувати за:";
-"sortByDefault" = "замовчуванням";
-"sortByRatingAscending" = "Рейтинг";
-"sortByRatingDescending" = "Рейтинг";
+"sortByDefault" = "За замовчуванням";
+"sortByRatingDescending" = "Рейтингом";
 "sortByNameAscending" = "Iм'ям";
-"sortByNameDescending" = "Ім'ям";
-"sortByYearAscending" = "Роком";
-"sortByYearDescending" = "Роком";
-"sortByVotesAscending" = "Голосами";
 "sortByVotesDescending" = "Голосами";
+"sortOptionsCancelButton" = "Скасувати";
 
 // MARK: Errors
 "errorTitle" = "Помилка";
 "errorOkButton" = "OK";
 "networkErrorNoConnection" = "Ви офлайн. Будь ласка, увімкніть Wi-Fi або підключіться за допомогою мобільних даних.";
-"networkErrorNoDataAvailable" = "Даних немає";
+"networkErrorNoData" = "Даних немає";
 "networkErrorRequestFailed" = "Запит не вдався через: ";
 "networkErrorInvalidDataReceived" = "Отримані недійсні дані";
 "networkErrorInvalidURL" = "Недійсний URL";
@@ -42,3 +38,6 @@
 
 // MARK: Poster scene
 "posterSceneTitle" = "Постер";
+
+// MARK: Searching
+"searching" = "Шукаю";

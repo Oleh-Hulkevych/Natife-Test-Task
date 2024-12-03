@@ -5,7 +5,13 @@
 //  Created by Oleh on 30.11.2024.
 //
 
+import Foundation
+
 final class MoviesNetworkService: MoviesNetworkServiceProtocol {
+
+    var isConnectedPublisher: Published<Bool>.Publisher {
+        return networkService.isConnectedPublisher
+    }
     
     private let networkService: NetworkServiceProtocol
     
@@ -31,5 +37,10 @@ final class MoviesNetworkService: MoviesNetworkServiceProtocol {
     
     func getGenres() async throws -> APIGenres {
         try await networkService.request(MoviesEndpoint.genres)
+    }
+    
+    func getTotalPages(query: String) async throws -> Int {
+        let response = try await searchMovies(query: query, page: 1)
+        return response.totalPages
     }
 }
