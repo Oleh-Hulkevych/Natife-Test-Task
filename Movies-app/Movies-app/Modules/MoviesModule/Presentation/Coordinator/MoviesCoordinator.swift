@@ -25,9 +25,10 @@ final class MoviesCoordinator: MoviesCoordinatorProtocol {
         navigationController.setViewControllers([viewController], animated: false)
     }
     
-    func showMovieDetails(with id: Int) {
+    func showMovieDetails(with id: Int, title: String) {
         let viewController = factory.makeMovieDetailsViewController(
             movieId: id,
+            movieTitle: title,
             coordinator: self
         )
         navigationController.pushViewController(viewController, animated: true)
@@ -35,14 +36,12 @@ final class MoviesCoordinator: MoviesCoordinatorProtocol {
     
     func showPosterImage(_ imageURL: String) {
         let viewController = factory.makePosterViewController(imageURL: imageURL)
-        viewController.modalPresentationStyle = .fullScreen
-        navigationController.present(viewController, animated: true)
+        navigationController.present(UINavigationController(rootViewController: viewController), animated: true)
     }
     
     func showTrailerVideo(_ videoURL: String) {
         let viewController = factory.makeTrailerViewController(videoURL: videoURL)
-        viewController.modalPresentationStyle = .fullScreen
-        navigationController.present(viewController, animated: true)
+        navigationController.present(UINavigationController(rootViewController: viewController), animated: true)
     }
     
     func showSortActionSheet(

@@ -20,22 +20,16 @@ final class MoviesFactory: MoviesFactoryProtocol {
         return MoviesFeedViewController(viewModel: viewModel, coordinator: coordinator)
     }
     
-    func makeMovieDetailsViewController(movieId: Int, coordinator: MoviesCoordinator) -> UIViewController {
-        let viewModel = MovieDetailsViewModel(movieId: movieId, useCase: useCase)
+    func makeMovieDetailsViewController(movieId: Int, movieTitle: String, coordinator: MoviesCoordinator) -> UIViewController {
+        let viewModel = MovieDetailsViewModel(movieId: movieId, movieTitle: movieTitle, useCase: useCase)
         return MovieDetailsViewController(viewModel: viewModel, coordinator: coordinator)
     }
     
     func makePosterViewController(imageURL: String) -> UIViewController {
-        let viewModel = PosterViewModel(imageURL: imageURL)
-        let viewController = PosterViewController(viewModel: viewModel)
-        viewController.modalPresentationStyle = .fullScreen
-        return UIViewController()
+        PosterViewController(imageURL: imageURL)
     }
     
     func makeTrailerViewController(videoURL: String) -> UIViewController {
-        let viewModel = TrailerViewModel(videoURL: videoURL)
-        let viewController = TrailerViewController(viewModel: viewModel)
-        viewController.modalPresentationStyle = .automatic
-        return UIViewController()
+        TrailerViewController(urlString: videoURL)
     }
 }

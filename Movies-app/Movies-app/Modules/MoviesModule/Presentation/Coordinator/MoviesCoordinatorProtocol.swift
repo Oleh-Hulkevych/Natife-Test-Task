@@ -8,9 +8,10 @@
 import UIKit
 
 protocol MoviesCoordinatorProtocol: AnyObject {
+    
     var navigationController: UINavigationController { get }
     func start()
-    func showMovieDetails(with id: Int)
+    func showMovieDetails(with id: Int, title: String)
     func showPosterImage(_ imageURL: String)
     func showTrailerVideo(_ videoURL: String)
     func showSortActionSheet(

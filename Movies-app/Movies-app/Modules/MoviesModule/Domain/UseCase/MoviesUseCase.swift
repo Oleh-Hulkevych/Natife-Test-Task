@@ -27,11 +27,15 @@ final class MoviesUseCase: MoviesUseCaseProtocol {
         await repository.loadCachedPopularMovies()
     }
     
+    func searchMovies(query: String) async throws -> [Movie] {
+        try await repository.searchMovies(query: query)
+    }
+    
     func loadMovieDetails(id: Int) async throws -> MovieDetails {
         try await repository.loadMovieDetails(id: id)
     }
     
-    func searchMovies(query: String) async throws -> [Movie] {
-        return try await repository.searchMovies(query: query)
+    func loadLatestTrailerURL(id: Int) async throws -> String? {
+        try await repository.loadLatestTrailerURL(id: id)
     }
 }

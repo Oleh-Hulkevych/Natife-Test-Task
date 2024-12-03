@@ -8,7 +8,6 @@
 import UIKit
 
 enum SortOption: Int, CaseIterable {
-
     case ratingDescending
     case nameAscending
     case votesDescending

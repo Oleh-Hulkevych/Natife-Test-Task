@@ -19,10 +19,6 @@ struct Movie {
     let video: Bool
 }
 
-/// Note: If mapping logic required complex processing or additional dependencies,
-/// it would make more sense to use a custom mapper with protocol approach.
-/// However, in this case with straightforward one-to-one mapping,
-/// using an extension is a simpler and cleaner solution.
 extension Movie {
    init(from apiMovie: APIMovie, genres: [APIGenre]) {
        self.id = apiMovie.id

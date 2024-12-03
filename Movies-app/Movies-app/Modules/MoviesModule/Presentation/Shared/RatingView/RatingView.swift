@@ -66,14 +66,14 @@ final class RatingView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
 
     override func layoutSubviews() {
         super.layoutSubviews()
         setupLayerAttributes()
     }
 
-    // MARK: - Configuration
+    // MARK: Configuration
 
     func configure(withRating rating: CGFloat, votes: Int) {
         guard rating >= 0, rating <= maxRating else { return }
@@ -88,7 +88,7 @@ final class RatingView: UIView {
         }
     }
 
-    // MARK: - Setup
+    // MARK: Setup
 
     private func setupViews() {
         backgroundColor = .black
@@ -109,7 +109,7 @@ final class RatingView: UIView {
         diagramLayer.path = circlePath.cgPath
     }
 
-    // MARK: - Helpers
+    // MARK: Helpers
 
     private func getColor(for rating: CGFloat) -> UIColor {
         guard rating > 0 else { return .systemRed }

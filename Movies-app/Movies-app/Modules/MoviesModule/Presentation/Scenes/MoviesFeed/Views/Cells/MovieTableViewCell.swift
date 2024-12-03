@@ -104,7 +104,7 @@ final class MovieTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -122,8 +122,6 @@ final class MovieTableViewCell: UITableViewCell {
         noPosterLabel.isHidden = true
         ratingView.configure(withRating: 0, votes: 0)
     }
-    
-    // MARK: - Configuration
     
     func configure(with movie: Movie) {
         titleLabel.text = movie.title
@@ -150,7 +148,7 @@ final class MovieTableViewCell: UITableViewCell {
         }
     }
     
-    // MARK: - Setup
+    // MARK: UI Setup
     
     private func setupContainerView() {
         contentView.addSubview(containerView)
