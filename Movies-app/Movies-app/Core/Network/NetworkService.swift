@@ -10,7 +10,7 @@ import Alamofire
 
 protocol NetworkServiceProtocol {
     func request<T: Decodable>(_ endpoint: EndpointProtocol) async throws -> T
-    var isConnected: Bool { get }
+    var isConnectedPublisher: Published<Bool>.Publisher { get }
     var networkError: NetworkError? { get }
 }
 
@@ -19,29 +19,29 @@ final class NetworkService: NetworkServiceProtocol {
     private let session: Session
     private let reachabilityManager: NetworkReachabilityManager?
     
+    @Published private(set) var isConnected: Bool = false
+    var isConnectedPublisher: Published<Bool>.Publisher { $isConnected }
     @Published private(set) var networkError: NetworkError?
     
     init(session: Session = .default) {
         self.session = session
         self.reachabilityManager = NetworkReachabilityManager.default
+        self.isConnected = self.reachabilityManager?.isReachable ?? false
         setupReachabilityManager()
-    }
-    
-    var isConnected: Bool {
-        reachabilityManager?.isReachable ?? false
     }
     
     private func setupReachabilityManager() {
         reachabilityManager?.startListening { [weak self] status in
             guard let self else { return }
-            switch status {
-            case .reachable(let connectionType):
-                switch connectionType {
-                case .ethernetOrWiFi, .cellular:
+            DispatchQueue.main.async {
+                switch status {
+                case .reachable:
+                    self.isConnected = true
                     self.networkError = nil
+                case .notReachable, .unknown:
+                    self.isConnected = false
+                    self.networkError = .noConnection
                 }
-            case .notReachable, .unknown:
-                self.networkError = .noConnection
             }
         }
     }

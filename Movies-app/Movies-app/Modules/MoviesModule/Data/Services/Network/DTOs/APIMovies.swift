@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct APIMovies: Codable {
+struct APIMovies: Decodable {
     let movies: [APIMovie]
     let totalPages: Int
 

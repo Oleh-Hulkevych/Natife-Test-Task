@@ -17,21 +17,17 @@
 // MARK: Sort options
 "sortOptionsTitle" = "Sort by:";
 "sortByDefault" = "Default";
-"sortByRatingAscending" = "Rating";
 "sortByRatingDescending" = "Rating";
 "sortByNameAscending" = "Name";
-"sortByNameDescending" = "Name";
-"sortByYearAscending" = "Year";
-"sortByYearDescending" = "Year";
-"sortByVotesAscending" = "Votes";
 "sortByVotesDescending" = "Votes";
+"sortOptionsCancelButton" = "Cancel";
 
 // MARK: - Errors
 "errorTitle" = "Error";
 "errorOkButton" = "OK";
 "sortByVotesDescending" = "Votes";
 "networkErrorNoConnection" = "You are offline. Please, enable your Wi-Fi or connect using cellular data.";
-"networkErrorNoDataAvailable" = "No data available";
+"networkErrorNoData" = "No data available";
 "networkErrorRequestFailed" = "Request failed due to: ";
 "networkErrorInvalidDataReceived" = "Invalid data received";
 "networkErrorInvalidURL" = "Invalid URL";
@@ -44,3 +40,6 @@
 
 // MARK: Poster scene
 "posterSceneTitle" = "Poster";
+
+// MARK: Searching
+"searching" = "Searching";

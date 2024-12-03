@@ -19,14 +19,11 @@ enum LocalizedKey: String {
 
     // MARK: Sort options
     case sortByDefault
-    case sortByRatingAscending
     case sortByRatingDescending
     case sortByNameAscending
-    case sortByNameDescending
-    case sortByYearAscending
     case sortByYearDescending
-    case sortByVotesAscending
     case sortByVotesDescending
+    case sortOptionsCancelButton
 
     // MARK: Errors
     case errorTitle
@@ -44,6 +41,9 @@ enum LocalizedKey: String {
 
     // MARK: Poster scene
     case posterSceneTitle
+    
+    // MARK: Searching
+    case searching
 
     var localizedString: String {
         return NSLocalizedString(rawValue, comment: "")

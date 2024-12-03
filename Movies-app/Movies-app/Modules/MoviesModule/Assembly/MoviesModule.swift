@@ -24,11 +24,9 @@ final class MoviesModule: MoviesModuleProtocol {
        container: DependencyContainerProtocol
    ) -> MoviesModule {
        
-       let storageService = StorageService(coreDataManager: container.coreDataManager)
        let moviesNetworkService = MoviesNetworkService(networkService: container.networkService)
        let repository = MoviesRepository(
-           networkService: moviesNetworkService,
-           storageService: storageService
+           networkService: moviesNetworkService
        )
 
        let useCase = MoviesUseCase(repository: repository)

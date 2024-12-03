@@ -9,14 +9,14 @@ import Foundation
 
 struct APIMovie: Codable {
     let id: Int
-    let rating: Double
-    let votes: Int
-    let releaseDate: String
+    let rating: Double?
+    let votes: Int?
+    let releaseDate: String?
     let title: String
     let posterPath: String?
     let backdropPath: String?
-    let genresIDs: [Int]
-    let video: Bool
+    let genresIDs: [Int]?
+    let video: Bool?
 
     enum CodingKeys: String, CodingKey {
         case id
