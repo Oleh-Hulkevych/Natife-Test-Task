@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  Movies-app
+
+  Created by Oleh on 29.11.2024.
+  
+*/
+
+// MARK: Movies feed scene
+"moviesSceneTitle" = "Відомі фільми";
+"searchPlaceholder" = "Пошук";
+"noResultsLabel" = "Фільмів не знайдено";
+"noPosterLabel" = "Немає постера";
+"pullToRefresh" = "Потягніть ↓ щоб перезавантажити";
+"loadingMovies" = "Завантажую фільми";
+
+// MARK: Sort options
+"sortOptionsTitle" = "Сортувати за:";
+"sortByDefault" = "За замовчуванням";
+"sortByRatingDescending" = "Рейтингом";
+"sortByNameAscending" = "Iм'ям";
+"sortByVotesDescending" = "Голосами";
+"sortOptionsCancelButton" = "Скасувати";
+
+// MARK: Errors
+"errorTitle" = "Помилка";
+"errorOkButton" = "OK";
+"networkErrorNoConnection" = "Ви офлайн. Будь ласка, увімкніть Wi-Fi або підключіться за допомогою мобільних даних.";
+"networkErrorNoData" = "Даних немає";
+"networkErrorRequestFailed" = "Запит не вдався через: ";
+"networkErrorInvalidDataReceived" = "Отримані недійсні дані";
+"networkErrorInvalidURL" = "Недійсний URL";
+"networkErrorUnauthorizedAccess" = "Неавторизований доступ";
+"networkErrorDecodingFailed" = "Помилка декодування: ";
+
+// MARK: Trailer scene
+"trailerSceneTitle" = "Трейлер";
+
+// MARK: Poster scene
+"posterSceneTitle" = "Постер";
+
+// MARK: Searching
+"searching" = "Шукаю";
