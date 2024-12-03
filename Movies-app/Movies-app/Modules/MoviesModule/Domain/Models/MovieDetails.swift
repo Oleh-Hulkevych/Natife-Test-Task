@@ -21,10 +21,6 @@ struct MovieDetails {
     let backdropImageURLString: String?
 }
 
-/// Note: If mapping logic required complex processing or additional dependencies,
-/// it would make more sense to use a custom mapper with protocol approach.
-/// However, in this case with straightforward one-to-one mapping,
-/// using an extension is a simpler and cleaner solution.
 extension MovieDetails {
     init(from apiDetails: APIMovieDetails) {
         self.id = apiDetails.id
@@ -36,7 +32,7 @@ extension MovieDetails {
         self.votes = apiDetails.votes
         self.overview = apiDetails.overview
         self.video = apiDetails.video
-        self.posterImageURLString = apiDetails.posterPath.map { APIConstants.baseImageUrl + $0 }
-        self.backdropImageURLString = apiDetails.backdropPath.map { APIConstants.baseImageUrl + $0 }
+        self.posterImageURLString = apiDetails.posterPath.map { $0 }
+        self.backdropImageURLString = apiDetails.backdropPath.map { $0 }
     }
 }

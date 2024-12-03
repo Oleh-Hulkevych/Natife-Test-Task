@@ -33,6 +33,7 @@ final class MoviesFeedViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -168,7 +169,7 @@ extension MoviesFeedViewController: UITableViewDelegate {
     private func navigateToMovieDetails(at index: Int) {
         let movie = viewModel.state.movies[index]
         if viewModel.state.isNetworkConnected {
-            coordinator.showMovieDetails(with: movie.id)
+            coordinator.showMovieDetails(with: movie.id, title: movie.title)
         } else {
             showError(.noConnection)
         }
@@ -246,19 +247,17 @@ extension MoviesFeedViewController: MoviesSortBarButtonDelegate {
     }
 }
 
-// MARK: - UI Configurations
+// MARK: - UI Setup
 
-private extension MoviesFeedViewController {
+extension MoviesFeedViewController {
     
     private func setupUI() {
-        // Controller
         view.backgroundColor = .systemBackground
         title = LocalizedKey.moviesSceneTitle.localizedString
-        // Navigation items
         navigationItem.rightBarButtonItem = sortButton
     }
     
-    func setupLayout() {
+    private func setupLayout() {
         
         view.addSubview(searchBar)
         searchBar.anchor(

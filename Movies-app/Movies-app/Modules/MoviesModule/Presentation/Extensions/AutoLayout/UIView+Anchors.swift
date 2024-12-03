@@ -8,7 +8,8 @@
 import UIKit
 
 extension UIView {
-    // MARK: - Anchoring
+    
+    // MARK: Anchoring
 
     func anchor(
         top: NSLayoutYAxisAnchor? = nil,
@@ -43,7 +44,7 @@ extension UIView {
         }
     }
 
-    // MARK: - Centering
+    // MARK: Centering
 
     func center(inView view: UIView, yOffset: CGFloat = 0) {
         translatesAutoresizingMaskIntoConstraints = false
@@ -51,7 +52,7 @@ extension UIView {
         centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: yOffset).isActive = true
     }
 
-    // MARK: - Center X
+    // MARK: Center X
 
     func centerX(inView view: UIView, topAnchor: NSLayoutYAxisAnchor? = nil, paddingTop: CGFloat = 0) {
         translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +62,7 @@ extension UIView {
         }
     }
 
-    // MARK: - Center Y
+    // MARK: Center Y
 
     func centerY(inView view: UIView,
                  leftAnchor: NSLayoutXAxisAnchor? = nil,
@@ -73,7 +74,7 @@ extension UIView {
         }
     }
 
-    // MARK: - Sizing
+    // MARK: Sizing
 
     func setDimensions(height: CGFloat, width: CGFloat) {
         translatesAutoresizingMaskIntoConstraints = false
@@ -91,7 +92,7 @@ extension UIView {
         widthAnchor.constraint(equalToConstant: width).isActive = true
     }
 
-    // MARK: - Filling
+    // MARK: Filling
 
     func fillSuperview(padding: UIEdgeInsets = .zero) {
         guard let superview else { return }

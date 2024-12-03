@@ -13,4 +13,5 @@ protocol MoviesUseCaseProtocol {
     func loadCachedPopularMovies() async -> [Movie]
     func loadMovieDetails(id: Int) async throws -> MovieDetails
     func searchMovies(query: String) async throws -> [Movie]
+    func loadLatestTrailerURL(id movieId: Int) async throws -> String?
 }
