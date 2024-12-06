@@ -124,7 +124,7 @@ final class MoviesFeedViewController: UIViewController {
     }
 }
 
-// MARK: - Table view delegates & data source
+// MARK: - Collection view delegates & data source
 
 extension MoviesFeedViewController: UICollectionViewDataSource {
     
