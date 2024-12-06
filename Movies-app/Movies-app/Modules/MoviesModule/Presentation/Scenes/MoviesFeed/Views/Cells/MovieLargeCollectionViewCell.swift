@@ -1,5 +1,5 @@
 //
-//  MovieTableViewCell.swift
+//  MovieCollectionViewCell.swift
 //  Movies-app
 //
 //  Created by Oleh on 01.12.2024.
@@ -8,7 +8,7 @@
 import UIKit
 import Kingfisher
 
-final class MovieTableViewCell: UITableViewCell {
+final class MovieLargeCollectionViewCell: UICollectionViewCell {
     
     // MARK: UI Elements
     
@@ -83,16 +83,16 @@ final class MovieTableViewCell: UITableViewCell {
     
     // MARK: Properties
     
-    static let reuseIdentifier = String(describing: MovieTableViewCell.self)
+    static let reuseIdentifier = String(describing: MovieLargeCollectionViewCell.self)
     private let smallPadding = UIConstants.smallPadding
     private let mediumPadding = UIConstants.mediumPadding
     private let bigItemSideSize = UIConstants.bigItemSideSize
     private let loaderFadeInterval: TimeInterval = 0.3
-    
+
     // MARK: Initialization
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupContainerView()
         setupImageView()
         setupTopElements()
@@ -124,11 +124,11 @@ final class MovieTableViewCell: UITableViewCell {
     }
     
     func configure(with movie: Movie) {
+        setImage(from: movie)
         titleLabel.text = movie.title
         yearLabel.text = movie.year
         genresLabel.text = movie.genres.map { $0.name }.joined(separator: UIConstants.pointSeparator)
         ratingView.configure(withRating: movie.rating, votes: movie.votes)
-        setImage(from: movie)
     }
     
     private func setImage(from movie: Movie) {

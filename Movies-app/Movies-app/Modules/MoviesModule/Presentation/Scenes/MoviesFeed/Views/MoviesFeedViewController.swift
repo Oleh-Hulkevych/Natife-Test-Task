@@ -13,8 +13,8 @@ final class MoviesFeedViewController: UIViewController {
     // MARK: UI Elements
     private lazy var sortButton = MoviesSortBarButtonItem(delegate: self)
     private lazy var searchBar = MoviesSearchBar(delegate: self)
-    private lazy var tableView = MoviesTableView(delegate: self)
     private lazy var emptyStateLabel = MoviesEmptyStateLabel()
+    private lazy var collectionView = MoviesCollectionView(delegate: self)
     
     // Combine
     private var cancellables = Set<AnyCancellable>()
@@ -94,7 +94,7 @@ final class MoviesFeedViewController: UIViewController {
     
     private func handleEmptyState(for movies: [Movie]) {
         emptyStateLabel.isHidden = !movies.isEmpty
-        tableView.reloadData()
+        collectionView.reloadData()
     }
     
     private func showError(_ error: NetworkError) {
@@ -126,44 +126,70 @@ final class MoviesFeedViewController: UIViewController {
 
 // MARK: - Table view delegates & data source
 
-extension MoviesFeedViewController: UITableViewDataSource {
+extension MoviesFeedViewController: UICollectionViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.state.movies.count
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        MoviesSection.allCases.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard
-            indexPath.row < viewModel.state.movies.count,
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: MovieTableViewCell.reuseIdentifier
-            ) as? MovieTableViewCell
-        else {
-            return UITableViewCell()
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let section = MoviesSection(rawValue: section) else { return 0 }
+        switch section {
+            // I didn’t get creative here and used only the data we already have.
+        case .parallax: return viewModel.state.movies.count
+        case .carousel: return viewModel.state.movies.count
+        case .grouped: return viewModel.state.movies.count
+        case .horizontalFeed: return viewModel.state.movies.count
+        case .verticalFeed: return viewModel.state.movies.count
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let section = MoviesSection(rawValue: indexPath.section) else {
+            return UICollectionViewCell()
         }
         
-        let movie = viewModel.state.movies[indexPath.row]
-        cell.configure(with: movie)
-        return cell
+        let movie = viewModel.state.movies[indexPath.item]
+        return section.dequeueCell(in: collectionView, at: indexPath, with: movie)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            guard let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: MoviesSectionHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as? MoviesSectionHeaderView else {
+                return UICollectionReusableView()
+            }
+            
+            if viewModel.state.isNetworkConnected {
+                let section = MoviesSection(rawValue: indexPath.section) ?? .parallax
+                header.configure(with: section.title)
+            } else {
+                header.configure(with: "")
+            }
+            
+            return header
+        }
+        return UICollectionReusableView()
     }
 }
 
-extension MoviesFeedViewController: UITableViewDelegate {
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+extension MoviesFeedViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         guard viewModel.state.userFlow == .browsing else { return }
         guard viewModel.state.isNetworkConnected else { return }
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let frameHeight = scrollView.frame.size.height
-        if offsetY > contentHeight - frameHeight * 1.5 {
+        let maxItem = indexPaths.map { $0.item }.max() ?? 0
+        if maxItem > viewModel.state.movies.count - 5 {
             viewModel.loadMorePopularMovies()
         }
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        navigateToMovieDetails(at: indexPath.row)
+}
+
+extension MoviesFeedViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        navigateToMovieDetails(at: indexPath.item)
     }
     
     private func navigateToMovieDetails(at index: Int) {
@@ -176,23 +202,19 @@ extension MoviesFeedViewController: UITableViewDelegate {
     }
 }
 
-extension MoviesFeedViewController: MoviesTableViewDelegate {
+extension MoviesFeedViewController: MoviesCollectionViewDelegate {
     
     func refreshTriggered() {
         viewModel.switchUserFlow(to: .browsing)
         resetSearchBar()
         viewModel.refreshMovies()
-        tableView.refreshControl?.endRefreshing()
+        collectionView.refreshControl?.endRefreshing()
     }
     
     private func resetSearchBar() {
         searchBar.resignFirstResponder()
         searchBar.text = ""
         searchBar.setShowsCancelButton(false, animated: true)
-    }
-    
-    func calculateRowHeight() -> CGFloat {
-        return view.safeAreaLayoutGuide.layoutFrame.height * 1 / 3
     }
 }
 
@@ -209,7 +231,7 @@ extension MoviesFeedViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
         guard let query = searchBar.text, !query.isEmpty else { return }
         viewModel.searchMovies(query: query)
-        tableView.setContentOffset(.zero, animated: true)
+        collectionView.setContentOffset(.zero, animated: true)
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -218,7 +240,7 @@ extension MoviesFeedViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
         viewModel.refreshMovies()
         searchBar.setShowsCancelButton(false, animated: true)
-        tableView.setContentOffset(.zero, animated: true)
+        collectionView.setContentOffset(.zero, animated: true)
     }
 }
 
@@ -242,7 +264,7 @@ extension MoviesFeedViewController: MoviesSortBarButtonDelegate {
         ) { [weak self] option in
             guard let self else { return }
             self.viewModel.applySorting(option)
-            self.tableView.setContentOffset(.zero, animated: true)
+            collectionView.setContentOffset(.zero, animated: true)
         }
     }
 }
@@ -266,15 +288,14 @@ extension MoviesFeedViewController {
             right: view.rightAnchor
         )
         
-        view.addSubview(tableView)
-        tableView.anchor(
+        view.addSubview(collectionView)
+        collectionView.anchor(
             top: searchBar.bottomAnchor,
             left: view.leftAnchor,
             bottom: view.bottomAnchor,
             right: view.rightAnchor
         )
-        
-        tableView.addSubview(emptyStateLabel)
-        emptyStateLabel.center(inView: tableView)
+        collectionView.addSubview(emptyStateLabel)
+        emptyStateLabel.center(inView: collectionView)
     }
 }
